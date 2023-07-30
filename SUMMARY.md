@@ -4,6 +4,19 @@
 
 ## 技术
 
+- [Neural Network 神经网络](/docs/nn)
+  - [Initialization 初始化](/docs/nn/initialization/initialization-summary.md)
+    - [Xavier Initialization](/docs/nn/initialization/Xavier-initialization.md)
+    - [He Initialization](/docs/nn/initialization/He-initialization.md)
+    - [BERT中的初始化](/docs/nn/initialization/BERT中的初始化.md)
+  - [Gradient 梯度](/docs/nn/gradient)
+    - [梯度消失与梯度爆炸](/docs/nn/gradient/梯度消失与梯度爆炸.md)
+  - [Optimizer 优化器](/docs/nn/optimizer)
+    - [Adam](/docs/nn/optimizer/adam.md)
+  - [Normalization](/docs/nn/normalization/norm-summary.md)
+    - [Batch Normalization](/docs/nn/normalization/Batch-Normalization.md)
+    - [Layer Normalization](/docs/nn/normalization/Layer-Normalization.md)
+    - [Batch Normalization 与 Layer Normalization 的差异](/docs/nn/normalization/Batch-Normalization-Layer-Normalization-Difference.md)
 - [NLP 自然语言处理](/docs/nlp)
   - [Models 模型结构](/docs/nlp/models)
     - [Transformers](/docs/nlp/models/transformers)
