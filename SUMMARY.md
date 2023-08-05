@@ -4,6 +4,11 @@
 
 ## 技术
 
+- [八股]()
+  - [Transformers 细节八股](/docs/nlp/models/transformers/Transformers中的细节.md)
+  - [T5 八股](/docs/nlp/models/transformers/t5/T5.md)
+  - [开源LLM八股](/docs/llm/开源LLM总结.md)
+  - [大模型优化八股](/docs/llm/大模型优化方法概览.md)
 - [Neural Network 神经网络](/docs/nn)
   - [Initialization 初始化](/docs/nn/initialization/initialization-summary.md)
     - [Xavier Initialization](/docs/nn/initialization/Xavier-initialization.md)
@@ -20,7 +25,11 @@
 - [NLP 自然语言处理](/docs/nlp)
   - [Models 模型结构](/docs/nlp/models)
     - [Transformers](/docs/nlp/models/transformers)
-      - [八股](/docs/nlp/models/transformers/八股.md)
+      - [Transformers中的细节](/docs/nlp/models/transformers/Transformers中的细节.md)
+      - [T5](/docs/nlp/models/transformers/t5/T5.md)
+- [LLM 大语言模型](/docs/llm)
+  - [开源LLM总结](/docs/llm/开源LLM总结.md)
+  - [大模型优化方法概览](/docs/llm/大模型优化方法概览.md)
 - [Problems 编程题](/docs/problems/算法题知识归类.md)
   - [解法归类](/docs/problems/解法归类)
     - [背包问题](/docs/problems/解法归类/背包问题.md)
