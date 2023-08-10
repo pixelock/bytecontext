@@ -30,6 +30,7 @@
 - [LLM 大语言模型](/docs/llm)
   - [开源LLM总结](/docs/llm/开源LLM总结.md)
   - [大模型优化方法概览](/docs/llm/大模型优化方法概览.md)
+  - [为什么LLM大多使用Decoder-only架构](/docs/llm/theory/为什么LLM大多使用Decoder-only架构.md)
 - [Framework 模型框架](/docs/framework)
   - [Pytorch](/docs/framework/pytorch)
     - [Operator 算子](/docs/framework/pytorch/operator)
