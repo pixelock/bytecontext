@@ -31,8 +31,10 @@
   - [开源LLM总结](/docs/llm/开源LLM总结.md)
   - [大模型优化方法概览](/docs/llm/大模型优化方法概览.md)
 - [Framework 模型框架](/docs/framework)
-  - [Pytorch](/docs/framework)
-    - 
+  - [Pytorch](/docs/framework/pytorch)
+    - [Operator 算子](/docs/framework/pytorch/operator)
+      - [一维卷积](/docs/framework/pytorch/operator/一维卷积.md)
+    - [Pytorch中的广播机制](/docs/framework/pytorch/Pytorch中的广播机制.md)
 - [Problems 编程题](/docs/problems/算法题知识归类.md)
   - [解法归类](/docs/problems/解法归类)
     - [背包问题](/docs/problems/解法归类/背包问题.md)
