@@ -33,6 +33,7 @@
   - [大模型优化方法概览](/docs/llm/大模型优化方法概览.md)
   - [为什么LLM大多使用Decoder-only架构](/docs/llm/theory/为什么LLM大多使用Decoder-only架构.md)
   - [Parallel 并行计算](/docs/llm/parallel)
+    - [数据并行](/docs/llm/parallel/data-parallel/数据并行.md)
   - [Quantization 量化](/docs/llm/quantization)
     - [浮点数的存储方式](/docs/llm/quantization/浮点数的存储方式.md)
     - [混合精度训练](/docs/llm/quantization/混合精度训练.md)
