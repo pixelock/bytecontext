@@ -43,6 +43,8 @@
     - [Operator 算子](/docs/framework/pytorch/operator)
       - [一维卷积](/docs/framework/pytorch/operator/一维卷积.md)
     - [Pytorch中的广播机制](/docs/framework/pytorch/Pytorch中的广播机制.md)
+  - [Huggingface datasets](/docs/framework/datasets/datasets简介.md)
+    - [使用 Datasets 读取本地数据](/docs/framework/datasets/读取本地数据.md)
 - [Stack 技术栈](/docs/stack)
   - [Hive](/docs/stack/hive)
     - [Hive语句执行逻辑](/docs/stack/hive/Hive语句执行逻辑.md)
