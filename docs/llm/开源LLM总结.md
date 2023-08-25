@@ -1,4 +1,3 @@
-
 # ChatGLM2
 
 [Github](https://github.com/THUDM/ChatGLM2-6B)
