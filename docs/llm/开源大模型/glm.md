@@ -110,6 +110,16 @@ GLM 使用了二维位置编码, 即**每个 token 都使用两个 position id �
 
 两个 position id, 通过两个不同的 embedding table, 映射成两个不同的位置向量, 然后加到输入的词向量上.
 
+### LayerNorm
+
+Post-LN 在前向传播的链路上存在一个无法绕过的 LN 结构, 会导致训练过程容易发散. 为了训练的稳定性, 大模型普遍采用了 Pre-LN 结构. Pre-LN 结构在前向传播中, 有一条直通的恒等路径, LN 是加在 Attention 和 FFN 结构之前的..
+
+但是在 **大规模 / 多模态** 混合精度训练(FP16)中, Pre-LN 也会存在不稳定的现象. 而 Pre-LN 的变体, Sandwich-LN 可以缓解这种现象, 做法是在 Attention 和 FFN 之后再加一个 LN, 进一步地缓解数值的溢出现象.
+
+
+
+![](/resources/images/llm/glm-6.png)
+
 ## 微调
 
 ### 分类任务
