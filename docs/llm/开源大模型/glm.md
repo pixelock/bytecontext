@@ -110,15 +110,25 @@ GLM 使用了二维位置编码, 即**每个 token 都使用两个 position id �
 
 两个 position id, 通过两个不同的 embedding table, 映射成两个不同的位置向量, 然后加到输入的词向量上.
 
+### RoPE
+
+RoPE 是一种旋转式编码, 本质是**用绝对位置编码实现相对位置编码**. 从空间上理解, 通过乘性计算作用到每个 token 向量上, 相当于对每个向量进行了旋转, 旋转后向量相乘(attention 计算时)就会得到两个向量的夹角, 这个夹角代表 token 之间的相对位置关系.
+
 ### LayerNorm
 
 Post-LN 在前向传播的链路上存在一个无法绕过的 LN 结构, 会导致训练过程容易发散. 为了训练的稳定性, 大模型普遍采用了 Pre-LN 结构. Pre-LN 结构在前向传播中, 有一条直通的恒等路径, LN 是加在 Attention 和 FFN 结构之前的..
 
 但是在 **大规模 / 多模态** 混合精度训练(FP16)中, Pre-LN 也会存在不稳定的现象. 而 Pre-LN 的变体, Sandwich-LN 可以缓解这种现象, 做法是在 Attention 和 FFN 之后再加一个 LN, 进一步地缓解数值的溢出现象.
 
-
-
 ![](/resources/images/llm/glm-6.png)
+
+GLM 采用的方法是 **DeepNet**, 本质上还是一种 Post-LN, 通过**更改初始化**以及**调整残差系数**, 稳定传播的稳定性. 实验证明可以做到千层 Post-LN 结构的稳定训练.
+
+$$
+\text{DeepNorm}(x) = \text{LayerNorm}(\alpha x + g(x)), \alpha > 1
+$$
+
+DeepNet 的详细原理可以参考: [为什么需要残差？一个来自DeepNet的视角](https://kexue.fm/archives/8994).
 
 ## 微调
 
