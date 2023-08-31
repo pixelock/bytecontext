@@ -40,6 +40,8 @@
   - [开源大模型](/docs/llm/开源大模型)
     - [GLM](/docs/llm/开源大模型/glm.md)
     - [ChatGLM](/docs/llm/开源大模型/chatglm.md)
+    - [LLaMA](/docs/llm/开源大模型/llama.md)
+    - [LLaMA2](/docs/llm/开源大模型/llama2.md)
   - [Parallel 并行计算](/docs/llm/parallel)
     - [数据并行](/docs/llm/parallel/data-parallel/数据并行.md)
   - [Quantization 量化](/docs/llm/quantization)
