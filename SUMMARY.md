@@ -28,6 +28,8 @@
       - [Transformer中的细节](/docs/nlp/models/transformers/Transformer中的细节.md)
       - [Transformer相关数值](/docs/nlp/models/transformers/Transformer相关数值.md)
       - [T5](/docs/nlp/models/transformers/t5/T5.md)
+      - [Position Encoding 位置编码](/docs/nlp/models/transformers/position-encoding)
+        - [RoPE](/docs/nlp/models/transformers/position-encoding/rope.md)
   - [Contrastive Learning 对比学习](/docs/nlp/contrastive)
     - [Loss 对比学习损失函数](/docs/nlp/contrastive/loss)
       - [InfoNCE Loss](/docs/nlp/contrastive/loss/infonce.md)
