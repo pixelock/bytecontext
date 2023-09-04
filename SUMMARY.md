@@ -71,6 +71,7 @@
 - [Stack 技术栈](/docs/stack)
   - [Hive](/docs/stack/hive)
     - [Hive语句执行逻辑](/docs/stack/hive/Hive语句执行逻辑.md)
+    - [随机采样](/docs/stack/hive/随机采样.md)
 - [Problems 编程题](/docs/problems/算法题知识归类.md)
   - [解法归类](/docs/problems/解法归类)
     - [背包问题](/docs/problems/解法归类/背包问题.md)
