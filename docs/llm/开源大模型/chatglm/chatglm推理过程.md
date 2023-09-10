@@ -481,3 +481,17 @@ while True:
 
 return input_ids
 ```
+
+# 推理过程拆解
+
+推理过程中, 在准备输入到模型的 input_ids, attention_mask, position_ids 时, 根据 `past_key_values` 是否有值, 分为两种情况处理.
+
+- `past_key_values` 没有值, 代表是第一次推理, 需要生成第一个 token. 会调用 `get_masks` 和 `get_position_ids` 获取序列完整的 attention_mask 和 position_ids
+- `past_key_values` 有值, 则说明已经进行过推理了, 也就是除了最后一个字之外, 其他所有 token 的表征已经确定(模型特点决定), 且每个 token 的表征也已经转换成 KV cache, 保存在 `past_key_values` 中了
+  - 所以本次推理的输入, 只需要输入最后一个 token(也就是上次推理生成的 token), 对应代码中的 `last_token` 参数
+  - attention_mask 和 position_ids 也只截取最后一位 token 对应的即可
+
+因此, 可以将完整的推理过程, 分为**预填充**(prefill)和**解码**(decode)两个阶段:
+
+- prefill 阶段会并行地对输入的 prompt 做前向计算, 存储 kv cache, 并输出第一个 token. 一次生成流程中, 只会做一次 prefill(即一次前向过程), 并将 kv cache 存储在 `past_key_values` 中(prefill 之前 `past_key_values` 为 `None`)
+- decode 阶段是产生后续新词的前向过程, 此时 `past_key_values` 不为空, 且会不断添加新的 kv 值. 由于 decode 阶段每生成一个 token 就会走一次前向过程, 因此 decode 是推理过程最耗时的阶段

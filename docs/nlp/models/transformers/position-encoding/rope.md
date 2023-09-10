@@ -236,6 +236,210 @@ q1, k1 = apply_rotary_pos_emb_index(q1, k1, cos, sin, position_ids)
 q2, k2 = apply_rotary_pos_emb_index(q2, k2, cos, sin, block_position_ids)
 ```
 
+## ChatGLM2
+
+ChatGLM2 不再使用 ChatGLM 中的二维位置编码, 而是使用一维位置编码, 编码的形式就是 Causal LM 中使用的从零递增的 position ids. 实现上不再需要 `position_id` 参数作为输入, 而是在生成 cos 和 sin 的 cache 张量时已经生成了每个 index 对应的中间值, 然后使用`apply_rotary_pos_emb` 直接将 `cache[:seq_length]` 应用到每个 token 上.
+
+RoPE 从定义到应用在 query 和 key 上, 有以下的几个步骤.
+
+首先定义 `RotaryEmbedding`.
+
+```python
+class RotaryEmbedding(nn.Module):
+    def __init__(self, dim, original_impl=False, device=None, dtype=None):
+        super().__init__()
+        inv_freq = 1.0 / (10000 ** (torch.arange(0, dim, 2, device=device).to(dtype=dtype) / dim))
+        self.register_buffer("inv_freq", inv_freq)
+        self.dim = dim
+        self.original_impl = original_impl
+
+    def forward_impl(
+            self, seq_len: int, n_elem: int, dtype: torch.dtype, device: torch.device, base: int = 10000
+    ):
+        # $\Theta = {\theta_i = 10000^{\frac{2(i-1)}{d}}, i \in [1, 2, ..., \frac{d}{2}]}$
+        theta = 1.0 / (base ** (torch.arange(0, n_elem, 2, dtype=dtype, device=device) / n_elem))
+
+        # Create position indexes `[0, 1, ..., seq_len - 1]`
+        seq_idx = torch.arange(seq_len, dtype=dtype, device=device)
+
+        # Calculate the product of position index and $\theta_i$
+        idx_theta = torch.outer(seq_idx, theta).float()
+
+        cache = torch.stack([torch.cos(idx_theta), torch.sin(idx_theta)], dim=-1)
+
+        # this is to mimic the behaviour of complex32, else we will get different results
+        if dtype in (torch.float16, torch.bfloat16, torch.int8):
+            cache = cache.bfloat16() if dtype == torch.bfloat16 else cache.half()
+        return cache
+
+    def forward(self, max_seq_len, offset=0):
+        return self.forward_impl(
+            max_seq_len, self.dim, dtype=self.inv_freq.dtype, device=self.inv_freq.device
+        )
+```
+
+在 `ChatGLMModel` 定义模型时, 使用如下的参数初始化 `RotaryEmbedding`. 对应的 position embedding 大小为**每个 head 中的 hidden size 的一半**. 在 6B 中的大小为 64.
+
+```python
+# hidden_size: 4096
+# num_attention_heads: 32
+# rotary_dim: 128
+rotary_dim = (
+    config.hidden_size // config.num_attention_heads if config.kv_channels is None else config.kv_channels
+)
+# rotary embedding dim: 64
+self.rotary_pos_emb = RotaryEmbedding(
+    rotary_dim // 2,
+    original_impl=config.original_rope,
+    device=device,
+    dtype=config.torch_dtype
+)
+```
+
+然后根据 max sequence length(6B为32768), 生成计算 position embedding 所需的值. 实现如下(其中的数值以 6B 模型为例).
+
+首先, 计算单个向量中, 每个位置对应的基数, 即公式中的每个 $$\theta_i$$. 将所有的 $$\theta_i$$ 按顺序拼接成向量 $$\Theta$$. 这里的 $$d=64$$, 是 `hidden_size_per_attention_head` 的一半. 而元素两两一组进行旋转, 因此基数的大小又要再除以2, 因此这里的 $$\Theta$$ 的长度为 32.
+
+$$\Theta = {\theta_i = 10000^{\frac{2(i-1)}{d}}, i \in [1, 2, ..., \frac{d}{2}]}$$
+
+对于 max sequence length, 每个位置的旋转角度, 由对应的下标和共同的基数 $$\Theta$$ 相乘决定. 因此将下标也以向量表示, 并将下标向量与基数向量进行外积, 得到每个位置对应的旋转角度向量拼接而成的矩阵 `idx_theta`.
+
+最后计算每个角度的 `cos` 和 `sin` 值, 并拼接在一起, 得到 `cache`, 形状大小为 `(max_seq_len, hidden_size_per_attention_head / 4, 2)`. 最后一维的 2, 代表是一个是 cos 值, 一个是 sin 值.
+
+```python
+def forward_impl(
+        self, seq_len: int, n_elem: int, dtype: torch.dtype, device: torch.device, base: int = 10000
+):
+    # $\Theta = {\theta_i = 10000^{\frac{2(i-1)}{d}}, i \in [1, 2, ..., \frac{d}{2}]}$
+    theta = 1.0 / (base ** (torch.arange(0, n_elem, 2, dtype=dtype, device=device) / n_elem))
+
+    # Create position indexes `[0, 1, ..., seq_len - 1]`
+    seq_idx = torch.arange(seq_len, dtype=dtype, device=device)
+
+    # Calculate the product of position index and $\theta_i$
+    idx_theta = torch.outer(seq_idx, theta).float()
+
+    cache = torch.stack([torch.cos(idx_theta), torch.sin(idx_theta)], dim=-1)
+
+    # this is to mimic the behaviour of complex32, else we will get different results
+    if dtype in (torch.float16, torch.bfloat16, torch.int8):
+        cache = cache.bfloat16() if dtype == torch.bfloat16 else cache.half()
+    return cache
+```
+
+这样就得到了每个位置对应的 position embedding, 形状大小为 `(max_seq_len, hidden_size_per_attention_head / 4, 2)`. 只不过使用的方法不能像 token embedding 一样直接 lookup, 而是需要借助下面的 `apply_rotary_pos_emb()` 方法, 对 query 和 key 代表的矩阵施加.
+
+`apply_rotary_pos_emb` 的逻辑为:
+
+`x` 为 query 或 key 对应的张量, 大小为 `(sq, b, np, hn)`. `rope_cache` 对应的 `(sq, hn / 4, 2)`. 然后将 `x` 按最后一维从中间划分为两部分, 每部分的大小为 `hn / 2`, 上下两部分分别记为 `x` 和 `x_pass`.
+
+将 `x` 的形状为调整为 `(sq, b, np, hn / 4, 2)`, 目的是最后一维两个元素为1组, 分别与之前得到的 cos 和 sin 元素相乘, 融合位置信息, 完成 RoPE 的计算, 得到的结果为 `x_out2`, 然后通过 `flatten` 将形状恢复为 `x` 原来的大小, 即 `(sq, b, np, hn / 2)`.
+
+最后将**融合了位置信息的上半部分 `x` 与没有融合位置信息的 `x_pass`** 重新拼接在一起, 返回.
+
+也就是说, **query 和 key 只有一半的参数融合了位置信息, 另一半没有融合**. 至于为什么这么做, 作者们没有给出原因, 可以参考:
+
+- [Github Issue](https://github.com/lucidrains/x-transformers/issues/40)
+
+大体意思是: 只旋转前半部分可以带来微小的性能提升, 并且实验验证不会有性能的损失
+
+```python
+@torch.jit.script
+def apply_rotary_pos_emb(x: torch.Tensor, rope_cache: torch.Tensor) -> torch.Tensor:
+    # x: [sq, b, np, hn]
+    sq, b, np, hn = x.size(0), x.size(1), x.size(2), x.size(3)
+    rot_dim = rope_cache.shape[-2] * 2
+    x, x_pass = x[..., :rot_dim], x[..., rot_dim:]
+    # truncate to support variable sizes
+    rope_cache = rope_cache[:sq]
+    xshaped = x.reshape(sq, -1, np, rot_dim // 2, 2)
+    rope_cache = rope_cache.view(sq, -1, 1, xshaped.size(3), 2)
+    x_out2 = torch.stack(
+        [
+            xshaped[..., 0] * rope_cache[..., 0] - xshaped[..., 1] * rope_cache[..., 1],
+            xshaped[..., 1] * rope_cache[..., 0] + xshaped[..., 0] * rope_cache[..., 1],
+        ],
+        -1,
+    )
+    x_out2 = x_out2.flatten(3)
+    return torch.cat((x_out2, x_pass), dim=-1)
+```
+
+## ChatGLM2-32k
+
+ChatGLM2 支持的上下文长度为 8K(8192), 而官方还提供了 ChatGLM2-32k 版本, 支持的上下文长度扩大了4倍, 达到 32K(32768). 为了适配长度的扩征, 32K 版本中使用了内插版本的 RoPE.
+
+相比于 8K 版本, 32K 的实现多了一个 `rope_ratio` 参数, 用于控制内插的比率, 默认值为 1, 即不内插. 内插的实现, 是通过对索引进行缩放:
+
+```python
+seq_idx = torch.arange(seq_len, dtype=dtype, device=device) / self.rope_ratio
+```
+
+这里的 `seq_len` 是 32768, 通过缩放函数在映射到 `[0, 8192]` 的范围内. 即总索引的数量为 32k, 但索引的大最大值为 8192, 并且有小数的情况.
+
+```python
+class RotaryEmbedding(nn.Module):
+    def __init__(self, dim, rope_ratio=1, original_impl=False, device=None, dtype=None):
+        super().__init__()
+        inv_freq = 1.0 / (10000 ** (torch.arange(0, dim, 2, device=device).to(dtype=dtype) / dim))
+        self.register_buffer("inv_freq", inv_freq)
+        self.dim = dim
+        self.original_impl = original_impl
+        self.rope_ratio = rope_ratio
+
+    def forward_impl(
+            self, seq_len: int, n_elem: int, dtype: torch.dtype, device: torch.device, base: int = 10000
+    ):
+        """Enhanced Transformer with Rotary Position Embedding.
+
+        Derived from: https://github.com/labmlai/annotated_deep_learning_paper_implementations/blob/master/labml_nn/
+        transformers/rope/__init__.py. MIT License:
+        https://github.com/labmlai/annotated_deep_learning_paper_implementations/blob/master/license.
+        """
+        # $\Theta = {\theta_i = 10000^{\frac{2(i-1)}{d}}, i \in [1, 2, ..., \frac{d}{2}]}$
+        theta = 1.0 / (base ** (torch.arange(0, n_elem, 2, dtype=dtype, device=device) / n_elem))
+
+        # Create position indexes `[0, 1, ..., seq_len - 1]`
+        seq_idx = torch.arange(seq_len, dtype=dtype, device=device) / self.rope_ratio
+
+        # Calculate the product of position index and $\theta_i$
+        idx_theta = torch.outer(seq_idx, theta).float()
+
+        cache = torch.stack([torch.cos(idx_theta), torch.sin(idx_theta)], dim=-1)
+
+        # this is to mimic the behaviour of complex32, else we will get different results
+        if dtype in (torch.float16, torch.bfloat16, torch.int8):
+            cache = cache.bfloat16() if dtype == torch.bfloat16 else cache.half()
+        return cache
+
+    def forward(self, max_seq_len, offset=0):
+        return self.forward_impl(
+            max_seq_len, self.dim, dtype=self.inv_freq.dtype, device=self.inv_freq.device
+        )
+```
+
+由于 ChatGLM2 不需要使用 `position_ids` 参数, 因此只需要在初始化 RoPE 层的时候指定缩放倍数, 其他的调用方式不变.
+
+```python
+self.rotary_pos_emb = RotaryEmbedding(
+    rotary_dim // 2,
+    rope_ratio=config.rope_ratio,
+    original_impl=config.original_rope,
+    device=device,
+    dtype=config.torch_dtype
+)
+
+# Apply rotary positional embeddings
+rotary_pos_emb = self.rotary_pos_emb(self.seq_length)
+if position_ids is not None:
+    rotary_pos_emb = rotary_pos_emb[position_ids]
+else:
+    rotary_pos_emb = rotary_pos_emb[None, :seq_length]
+rotary_pos_emb = rotary_pos_emb.transpose(0, 1).contiguous()
+```
+
+可以看到, 由于使用 `rotary_pos_emb[None, :seq_length]` 直接截取前 `seq_length` 个位置编码, 所以使用方法与缩放倍数无关.
+
 ---
 
 # 参考资料
