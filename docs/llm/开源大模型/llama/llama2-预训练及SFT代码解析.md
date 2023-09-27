@@ -8,9 +8,9 @@
 - 经过测试, 改进使得中文编码/解码速度提高了约350％
 - 此外, 我们还扩大了中文字符集的覆盖范围, 包括所有emoji符号, 这使得生成带有表情符号的文章更加高效
 
-预训练的代码入口为仓库中的 [train/pretrain/pretrain.sh](https://github.com/FlagAlpha/Llama2-Chinese/blob/main/train/pretrain/pretrain.sh), 对应的实现代码为 [train/pretrain/pretrain_clm.py](https://github.com/FlagAlpha/Llama2-Chinese).
+# 预训练
 
-# `main()`
+预训练的代码入口为仓库中的 [train/pretrain/pretrain.sh](https://github.com/FlagAlpha/Llama2-Chinese/blob/main/train/pretrain/pretrain.sh), 对应的实现代码为 [train/pretrain/pretrain_clm.py](https://github.com/FlagAlpha/Llama2-Chinese).
 
 ## 读取数据
 
@@ -321,4 +321,75 @@ if training_args.do_train:
     trainer.log_metrics("train", metrics)
     trainer.save_metrics("train", metrics)
     trainer.save_state()
+```
+
+## 评价指标
+
+使用**准确率**指标评价模型训练效果. **按 token 的粒度比较**, 即对验证数据集的 batch 内每个每个样本的每个 token 比较是否准确.
+
+```python
+from sklearn.metrics import accuracy_score
+
+def _compute(self, predictions, references, normalize=True, sample_weight=None):
+    return {
+        "accuracy": float(
+            accuracy_score(references, predictions, normalize=normalize, sample_weight=sample_weight)
+        )
+    }
+```
+
+```python
+def compute_metrics(eval_preds):
+    preds, labels = eval_preds
+    # preds have the same shape as the labels, after the argmax(-1) has been calculated
+    # by preprocess_logits_for_metrics but we need to shift the labels
+    labels = labels[:, 1:].reshape(-1)
+    preds = preds[:, :-1].reshape(-1)
+    return metric.compute(predictions=preds, references=labels)
+```
+
+# SFT
+
+指令微调分为对全量参数进行微调, 以及使用 LoRA 进行微调两种方案, 对应的代码入口分别为仓库中的:
+
+- 全量: [train/sft/finetune.sh](https://github.com/FlagAlpha/Llama2-Chinese/blob/main/train/sft/finetune.sh)
+- LoRA: [train/sft/finetune_lora.sh](https://github.com/FlagAlpha/Llama2-Chinese/blob/main/train/sft/finetune_lora.sh)
+
+对应的实现代码分别为:
+
+- 全量: [train/sft/finetune_clm.py](https://github.com/FlagAlpha/Llama2-Chinese/blob/main/train/sft/finetune_clm.py)
+- LoRA: [train/sft/finetune_clm_lora.py](https://github.com/FlagAlpha/Llama2-Chinese/blob/main/train/sft/finetune_clm_lora.py)
+
+与预训练的过程相比, 区别在于训练样本的组织方式. 在预训练过程中, 会将样本拼接, 保证 batch 内每个样本都达到最长长度而且没有 padding, 充分保证训练的效率.
+
+微调的过程则不需要再拼接, 数据集中的每条样本单独处理, 作为一条训练样本即可.
+
+如果输入样本只有一个字段, 对应的是**无条件生成**学习, 使用如下的处理方式:
+
+```python
+def tokenize_function(examples):
+    with CaptureLogger(tok_logger) as cl:
+        output = tokenizer([ item for item in examples[text_column_name]],truncation=True,max_length=data_args.block_size,padding=False,return_tensors=None)
+        output['labels'] = output['input_ids'].copy()
+    return output
+```
+
+如果输入样本有两个字段, 即一个 `input` 字段, 一个 `target` 字段, 对应的是**有条件生成**学习, 使用另一种处理函数:
+
+```python
+def generate_and_tokenize_prompt(data_point):
+    input_text = data_point[input_column_name]
+    target_text = data_point[target_column_name]
+    full_prompt = input_text+target_text
+    tokenized_full_prompt = tokenize(full_prompt)
+    if not train_on_inputs:
+        user_prompt = input_text
+        tokenized_user_prompt = tokenize(user_prompt)
+        user_prompt_len = len(tokenized_user_prompt["input_ids"])
+        tokenized_full_prompt["labels"] = [
+            -100
+        ] * user_prompt_len + tokenized_full_prompt["labels"][
+            user_prompt_len:
+        ] 
+    return tokenized_full_prompt
 ```
