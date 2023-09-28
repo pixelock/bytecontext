@@ -375,7 +375,7 @@ ChatGLM2 支持的上下文长度为 8K(8192), 而官方还提供了 ChatGLM2-32
 seq_idx = torch.arange(seq_len, dtype=dtype, device=device) / self.rope_ratio
 ```
 
-这里的 `seq_len` 是 32768, 通过缩放函数在映射到 `[0, 8192]` 的范围内. 即总索引的数量为 32k, 但索引的大最大值为 8192, 并且有小数的情况.
+这里的 `seq_len` 是 32768, 通过缩放函数在映射到 `[0, 8192]` 的范围内. 即总索引的数量为 32k, 但索引的最大值为 8192, 并且有小数的情况.
 
 ```python
 class RotaryEmbedding(nn.Module):

@@ -50,7 +50,6 @@
       - [ChatGLM2](/docs/llm/开源大模型/chatglm/chatglm2.md)
     - [LLama](/docs/llm/开源大模型/llama)
       - [LLaMA](/docs/llm/开源大模型/llama/llama.md)
-      - [LLaMA 源码解析](/docs/llm/开源大模型/llama/llama-源码解析.md)
       - [LLaMA2 升级内容](/docs/llm/开源大模型/llama/llama2.md)
       - [LLaMA2 源码解析](/docs/llm/开源大模型/llama/llama2-源码解析.md)
       - [LLaMA2 预训练及SFT代码解析](/docs/llm/开源大模型/llama/llama2-预训练及SFT代码解析.md)
