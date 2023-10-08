@@ -89,9 +89,47 @@ model.active_adapter
 
 ```python
 model = PeftModel.from_pretrained(model, "FlagAlpha/Llama2-Chinese-7b-Chat-LoRA", adapter_name="chinese_chat")
-model.merge_and_unload()
+model = model.merge_and_unload()
 model.save_pretrained(output_path)
 ```
+
+保存后的文件包含:
+
+![](/resources/images/llm/lora-merge.png)
+
+与基座模型的文件一致. 再看看 `config.json` 中关于模型的定义:
+
+```json
+{
+  "_name_or_path": "meta-llama/Llama-2-7b-hf",
+  "architectures": [
+    "LlamaForCausalLM"
+  ],
+  "attention_bias": false,
+  "bos_token_id": 1,
+  "eos_token_id": 2,
+  "hidden_act": "silu",
+  "hidden_size": 4096,
+  "initializer_range": 0.02,
+  "intermediate_size": 11008,
+  "max_position_embeddings": 4096,
+  "model_type": "llama",
+  "num_attention_heads": 32,
+  "num_hidden_layers": 32,
+  "num_key_value_heads": 32,
+  "pretraining_tp": 1,
+  "rms_norm_eps": 1e-05,
+  "rope_scaling": null,
+  "rope_theta": 10000.0,
+  "tie_word_embeddings": false,
+  "torch_dtype": "float32",
+  "transformers_version": "4.34.0.dev0",
+  "use_cache": true,
+  "vocab_size": 32000
+}
+```
+
+与基座模型的配置文件完全相同, 包括模型名称(`_name_or_path`)以及模型种类(`model_type`)等都没有变. 使用 `AutoModelForCausalLM` 仍然会加载为基座模型的类. 
 
 # 参考
 
