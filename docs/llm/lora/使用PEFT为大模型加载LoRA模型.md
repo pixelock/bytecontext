@@ -89,6 +89,9 @@ model.active_adapter
 
 ```python
 model = PeftModel.from_pretrained(model, "FlagAlpha/Llama2-Chinese-7b-Chat-LoRA", adapter_name="chinese_chat")
+print(type(model))
+# 输出: <class 'transformers.models.llama.modeling_llama.LlamaForCausalLM'>
+# 是 base_model 的类
 model = model.merge_and_unload()
 model.save_pretrained(output_path)
 ```
