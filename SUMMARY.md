@@ -97,6 +97,7 @@
 - [Solution 解决方案](/docs/solutions/summary.md)
   - [QA System 问答系统](/docs/solutions/qa)
     - [基于 LLM 解决专业领域问答 - 经验分享](/docs/solutions/qa/基于LLM解决专业领域问答.md)
+  - [ABSA 细粒度情感分析](/docs/solutions/absa/summary.md)
 - [Problems 编程题](/docs/problems/算法题知识归类.md)
   - [解法归类](/docs/problems/解法归类)
     - [背包问题](/docs/problems/解法归类/背包问题.md)
