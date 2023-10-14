@@ -27,6 +27,8 @@
   - [Multi task 多任务学习](/docs/nn/multi-task)
     - [MMoE 的问题和解决方法](/docs/nn/multi-task/mmoe的问题和解决方法.md)
   - [Training Trick 训练技巧](/docs/nn/training)
+    - [Dataset 数据集准备技巧](/docs/nn/training/dataset)
+      - [缓解标注数据的噪声问题](/docs/nn/training/dataset/缓解标注数据的噪声问题.md)
     - [Adversarial Training 对抗训练](/docs/nn/training/adversarial)
       - [NLP 中的对抗训练](/docs/nn/training/adversarial/nlp-adversarial.md)
 - [NLP 自然语言处理](/docs/nlp)
