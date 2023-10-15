@@ -82,6 +82,7 @@
         - [获取 Tensor 形状](/docs/framework/pytorch/tensor-op/get-shape.md)
       - [Shape mutating 形状变化](/docs/framework/pytorch/tensor-op/shape-mutating)
         - [Tenosr View 机制](/docs/framework/pytorch/tensor-op/tensor-view.md)
+        - [expand 和 repeat](/docs/framework/pytorch/tensor-op/expand-repeat.md)
     - [Operator 算子](/docs/framework/pytorch/operator)
       - [一维卷积](/docs/framework/pytorch/operator/一维卷积.md)
       - [Transformer相关算子](/docs/framework/pytorch/operator/transformer)
