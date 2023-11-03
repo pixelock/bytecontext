@@ -120,6 +120,8 @@
   - [Hive](/docs/stack/hive)
     - [Hive语句执行逻辑](/docs/stack/hive/Hive语句执行逻辑.md)
     - [随机采样](/docs/stack/hive/随机采样.md)
+  - [Gitbook](/docs/stack/gitbook)
+    - [Gitbook 中的配置项](/docs/stack/gitbook/gitbook中的配置项.md)
 - [Solution 解决方案](/docs/solutions/summary.md)
   - [QA System 问答系统](/docs/solutions/qa)
     - [基于 LLM 解决专业领域问答 - 经验分享](/docs/solutions/qa/基于LLM解决专业领域问答.md)
