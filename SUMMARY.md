@@ -108,6 +108,8 @@
     - [对数据集进行重新布置](/docs/framework/datasets/对数据集进行重新布置.md)
     - [Datasets 底层原理](/docs/framework/datasets/底层原理.md)
 - [Stack 技术栈](/docs/stack)
+  - [Python](/docs/stack/python)
+    - [Fire](/docs/stack/python/fire/Python命令行工具库.md)
   - [Linux](/docs/stack/linux)
     - [Ubuntu](/docs/stack/linux/ubuntu)
       - [Ubuntu功能文件夹默认目录设置](/docs/stack/linux/ubuntu/Ubuntu功能文件夹默认目录设置.md)
