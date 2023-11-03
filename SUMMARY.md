@@ -110,6 +110,8 @@
 - [Stack 技术栈](/docs/stack)
   - [Python](/docs/stack/python)
     - [Fire](/docs/stack/python/fire/Python命令行工具库.md)
+    - [pipenv](/docs/stack/python/pipenv/什么是pipenv.md)
+      - [使用pipenv对项目运行环境进行管理](/docs/stack/python/pipenv/使用pipenv对项目运行环境进行管理.md)
   - [Linux](/docs/stack/linux)
     - [Ubuntu](/docs/stack/linux/ubuntu)
       - [Ubuntu功能文件夹默认目录设置](/docs/stack/linux/ubuntu/Ubuntu功能文件夹默认目录设置.md)
