@@ -99,6 +99,8 @@
       - [Transformer相关算子](/docs/framework/pytorch/operator/transformer)
         - [torch.nn.functional.scaled_dot_product_attention](/docs/framework/pytorch/operator/transformer/scaled_dot_product_attention.md)
     - [Pytorch中的广播机制](/docs/framework/pytorch/Pytorch中的广播机制.md)
+  - [Huggingface](/docs/framework/huggingface)
+    - [下载huggingface中的模型](/docs/framework/huggingface/下载huggingface中的模型.md)
   - [Huggingface datasets](/docs/framework/datasets/datasets简介.md)
     - [使用 Datasets 读取本地数据](/docs/framework/datasets/读取本地数据.md)
     - [使用 Datasets 读取本地数据](/docs/framework/datasets/读取本地数据.md)
