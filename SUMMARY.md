@@ -115,6 +115,7 @@
     - [pipenv](/docs/stack/python/pipenv/什么是pipenv.md)
       - [使用pipenv对项目运行环境进行管理](/docs/stack/python/pipenv/使用pipenv对项目运行环境进行管理.md)
   - [Linux](/docs/stack/linux)
+    - [tmux](/docs/stack/linux/tmux/tmux.md)
     - [Ubuntu](/docs/stack/linux/ubuntu)
       - [Ubuntu功能文件夹默认目录设置](/docs/stack/linux/ubuntu/Ubuntu功能文件夹默认目录设置.md)
   - [Hive](/docs/stack/hive)
