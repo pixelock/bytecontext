@@ -7,6 +7,7 @@
 **新增**
 
 - [Automix](/docs/llm/rag/flow/automix.md): 介绍了一种 RAG 系统工作流, 将不同参数大小的 LLM 结合, 在资源消耗相对于只使用小模型扩增不大的前提下, 将系统的回答质量提升到与使用大模型近似的水平
+- [Chain-of-Note](/docs/llm/rag/answering/chain-of-note.md): 介绍了一个 prompt, 在 RAG 系统回答时使用. 通过 prompt 引导 LLM 依次输出对于每条 relevant document 的总结以及指明与 query 是否相关, 最后再输出 query 的回答. 通过这种引导的方式, 提升 RAG 系统回答的鲁棒性
 
 ### 19
 
