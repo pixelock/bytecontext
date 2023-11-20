@@ -90,6 +90,8 @@
       - [策略切分](/docs/llm/rag/split/策略切分.md)
     - [检索召回](/docs/llm/rag/recall/summary.md)
       - [关键词检索](/docs/llm/rag/recall/keyword.md)
+    - [流程优化](/docs/llm/rag/flow)
+      - [Automix](/docs/llm/rag/flow/automix.md)
 - [Framework 模型框架](/docs/framework)
   - [Pytorch](/docs/framework/pytorch)
     - [Tensor Operations](/docs/framework/pytorch/tensor-op/summary.md)
