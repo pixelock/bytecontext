@@ -2,6 +2,10 @@
 
 ## 11 November
 
+### 21
+
+- [vLLM](/docs/llm/inference/framework/vllm/vllm.md): vLLM 框架能够实现推理高吞吐量的原理
+
 ### 20
 
 **新增**

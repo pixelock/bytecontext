@@ -80,6 +80,8 @@
   - [Training 训练](/docs/llm/training/tricks-summary.md)
     - [7B-LLM 训练实验记录](/docs/llm/training/7B-LLM-训练实验记录.md)
   - [Inference 推理](/docs/llm/inference)
+    - [Framework 推理框架](/docs/llm/inference/framework)
+      - [vLLM](/docs/llm/inference/framework/vllm/vllm.md)
     - [Sampling 采样](/docs/llm/inference/sampling)
       - [Min-p 采样](/docs/llm/inference/sampling/min-p.md)
   - [LoRA](/docs/llm/lora)
