@@ -2,7 +2,15 @@
 
 ## 11 November
 
+### 22
+
+**新增**
+
+- [OpenAI API](/docs/llm/servering/openai-api.md): OpenAI Chat Completion API 的使用方法和出入参详细说明
+
 ### 21
+
+**新增**
 
 - [vLLM](/docs/llm/inference/framework/vllm/vllm.md): vLLM 框架能够实现推理高吞吐量的原理
 

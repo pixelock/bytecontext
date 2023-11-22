@@ -84,6 +84,8 @@
       - [vLLM](/docs/llm/inference/framework/vllm/vllm.md)
     - [Sampling 采样](/docs/llm/inference/sampling)
       - [Min-p 采样](/docs/llm/inference/sampling/min-p.md)
+  - [Servering 服务](/docs/llm/servering)
+    - [OpenAI API](/docs/llm/servering/openai-api.md)
   - [LoRA](/docs/llm/lora)
     - [使用 PEFT 为大模型加载 LoRA 模型](/docs/llm/lora/使用PEFT为大模型加载LoRA模型.md)
   - [RAG 检索增强生成](/docs/llm/rag/summary.md)
