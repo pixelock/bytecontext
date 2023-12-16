@@ -1,5 +1,11 @@
 # 2023
 
+## 12 December
+
+### 10
+
+- [WSL2](/docs/stack/linux/wsl/wsl2环境配置.md): WSL2 环境配置方法
+
 ## 11 November
 
 ### 22
