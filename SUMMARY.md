@@ -82,6 +82,7 @@
   - [Inference 推理](/docs/llm/inference)
     - [Framework 推理框架](/docs/llm/inference/framework)
       - [vLLM](/docs/llm/inference/framework/vllm/vllm.md)
+        - [VLLM 推理速度实验](/docs/llm/inference/framework/vllm/speed-experiment.md)
         - [vLLM 的坑](/docs/llm/inference/framework/vllm/error-case.md)
     - [Sampling 采样](/docs/llm/inference/sampling)
       - [Min-p 采样](/docs/llm/inference/sampling/min-p.md)
