@@ -1,4 +1,4 @@
-# RAG 系统的评价方法
+# RAG 系统的表现如何衡量
 
 RAG 系统产生的回答质量, 取决于两个方面:
 
@@ -30,6 +30,20 @@ RAG 系统产生的回答质量, 取决于两个方面:
 > 第四象限代表检索结果正确, 但答案错误. 这种情况可能是由于:
 > - LLM 模型本身的问题, 产生了幻觉
 > - prompt 设计的问题, 导致 LLM 无法理解问题, 需要优化 prompt template
+
+# 评价方法 Metrics
+
+从上面的 RAG 系统表现中, 可以总结出, 我们需要评价这些方面.
+
+## 检索模块 Retrieval
+
+### Context Precision
+
+Context Precision 衡量的是 `ground-truth relevant items` 是否在召回的 contexts 里面排名在靠前的位置. 需要用 question 和 召回的 contexts 进行衡量.
+
+### Context Recall
+
+Context Recall
 
 # 参考资料
 

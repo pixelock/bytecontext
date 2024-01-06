@@ -16,13 +16,20 @@
   - tensor-parallel- Tensor 并行大小
   - block-size: 默认为16, `{8,16,32}`
   - quantization: 是否使用量化, `{awq,squeezellm,None}`
+- Tensor parallel 数量. TP 对推理速度的影响分两方面:
+  - 整体来说, 随着服务 TP 节点的增加, 推理的吞吐量会降低. 这是因为节点之间的通信会占用时间, 影响整体的效率
+  - 但如果 GPU Memory 有限, 在部署完模型后, 剩余的显存很有限的情况下, batch_size 会变小, 并行处理能力变弱, 会严重影响吞吐量. 这种情况下要增加 TP 的节点数量, 增加可用显存, 恢复框架的并行能力
 
 **模型端**
 
 - 参数量
+  - 参数量越大, 计算越多, 推理速度越慢
+  - 另外在显存固定的情况下, 剩余的显存用于做 KV Cache, 如果模型参数量过大, 导致剩余的显存很有限的情景下, 会导致 batch_size 受限, 并行处理能力变弱, 严重影响吞吐量, 导致整体的推理变慢
 
 **硬件**
 
+- GPU 架构
+  - 决定了能否使用 Flashattention, quantization 等
 - GPU 性能
 - GPU 数量
 
@@ -641,4 +648,102 @@ Completion tokens per second: 259.7170681239465 tokens/s
 [2023-12-20 22:24:28,510][55][INFO] tokens-speed-per-request/second(终端用户视角): 3.8556273561774557
 [2023-12-20 22:24:28,510][247][INFO] None
 [2023-12-20 22:24:28,510][248][INFO] ------------------------------------------------------------------------------------------------------------------------
+```
+
+# [mistralai/Mistral-7B-Instruct-v0.2](https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2)
+
+## V100-PCIE-32G
+
+### benchmark 测试
+
+**使用的指令**
+
+```bash
+python benchmark_serving.py --dataset ShareGPT_V3_unfiltered_cleaned_split.json --tokenizer /data/models/models--mistralai--Mistral-7B-Instruct-v0.2 --request-rate 32 --num-prompts 1000
+```
+
+#### tensor-parallel-size: 1 (no parallel)
+
+```
+Total time: 229.30 s
+Throughput: 4.36 requests/s
+Average latency: 106.33 s
+Average latency per token: 0.33 s
+Average latency per output token: 1.93 s
+Completion tokens per second: 1003.687739120118 tokens/s
+```
+
+#### tensor-parallel-size: 2
+
+**实验数据**
+
+```
+Total time: 266.64 s
+Throughput: 3.75 requests/s
+Average latency: 115.37 s
+Average latency per token: 0.36 s
+Average latency per output token: 2.11 s
+Completion tokens per second: 863.1506528120032 tokens/s
+```
+
+#### tensor-parallel-size: 4
+
+```
+Total time: 355.78 s
+Throughput: 2.81 requests/s
+Average latency: 165.89 s
+Average latency per token: 0.53 s
+Average latency per output token: 3.16 s
+Completion tokens per second: 646.8858009372788 tokens/s
+```
+
+# [lmsys/vicuna-13b-v1.5-16k](https://huggingface.co/lmsys/vicuna-13b-v1.5-16k)
+
+## V100-PCIE-32G
+
+### benchmark 测试
+
+**使用的指令**
+
+```bash
+python benchmark_serving.py --dataset ShareGPT_V3_unfiltered_cleaned_split.json --tokenizer /data/models/lmsys_vicuna-13b-v1.5-16k --request-rate 32 --num-prompts 1000
+```
+
+#### tensor-parallel-size: 1 (no parallel)
+
+```
+Avg prompt throughput: 531.2 tokens/s, Avg generation throughput: 154.7 tokens/s, Running: 9 reqs, Swapped: 0 reqs, Pending: 944 reqs, GPU KV cache usage: 99.5%, CPU KV cache usage: 0.0%
+```
+
+由于单卡 32GB 的显存有限, KV cache 以及 batch_size 都会受限, vllm 会动态调整并行的策略, 会导致同时处理的请求有限, 最终的吞吐量严重受限.
+
+```
+Total time: 2297.20 s
+Throughput: 0.44 requests/s
+Average latency: 1140.68 s
+Average latency per token: 4.52 s
+Average latency per output token: 29.87 s
+Completion tokens per second: 106.70576728712904 tokens/s
+```
+
+#### tensor-parallel-size: 2
+
+```
+Total time: 500.91 s
+Throughput: 2.00 requests/s
+Average latency: 225.52 s
+Average latency per token: 0.82 s
+Average latency per output token: 5.09 s
+Completion tokens per second: 489.35292968767294 tokens/s
+```
+
+#### tensor-parallel-size: 4
+
+```
+Total time: 523.87 s
+Throughput: 1.91 requests/s
+Average latency: 248.23 s
+Average latency per token: 0.82 s
+Average latency per output token: 4.38 s
+Completion tokens per second: 467.90597060665993 tokens/s
 ```

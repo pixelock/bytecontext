@@ -95,6 +95,7 @@
       - [样本 Label 到 Target 的信息流动](/docs/llm/icl/theory/样本Label到Target的信息流动.md)
   - [RAG 检索增强生成](/docs/llm/rag/summary.md)
     - [RAG 系统评估优化策略](/docs/llm/rag/evaluate-improve.md)
+      - [评价指标](/docs/llm/rag/evaluate-index.md)
     - [文本切分策略](/docs/llm/rag/split)
       - [策略切分](/docs/llm/rag/split/策略切分.md)
     - [检索召回](/docs/llm/rag/recall/summary.md)

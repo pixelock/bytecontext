@@ -1,3 +1,11 @@
+# 2024
+
+## 1 January
+
+### 2
+
+- [评价指标](/docs/llm/rag/evaluate-index.md): RAG 系统常用的评价指标
+
 # 2023
 
 ## 12 December
